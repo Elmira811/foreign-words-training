@@ -46,7 +46,7 @@ let firstCard;
 let secondCard;
 let seconds = 0;
 let minutes = 0;
-let attempts = {};
+const attempts = {};
 
 
 function updateCard() {
@@ -80,7 +80,10 @@ function getExamCards() {
 };
 
 function resetSelection() {
-  firstCard.classList.remove('correct');
+  if (!firstCard.classList.contains('fade-out')) {
+    firstCard.classList.remove('correct');
+  };
+  
   firstCard = null;
   secondCard = null;
 };
