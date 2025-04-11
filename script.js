@@ -1,20 +1,24 @@
 "use strict";
 
-const words = ['home', 'dog', 'book', 'carrot', 'flower'];
-const translations = [
-  {name: 'дом',
+const words = [
+  {word: 'home',
+   translation: 'дом',
    example: 'He is home alone.'
   },
-  {name: 'собака',
+  {word: 'dog',
+   translation: 'собака',
    example: 'The dog is barking loudly.'
   },
-  {name: 'книга',
+  {word: 'book',
+   translation: 'книга',
    example: 'This is my favourite book.'
   },
-  {name: 'морковь',
+  {word: 'carrot',
+   translation: 'морковь',
    example: 'Rabbits like eating carrots.'
   },
-  {name: 'цветок',
+  {word: 'flower',
+   translation: 'цветок',
    example: 'Rose is a beautiful flower.'
   }
 ];
@@ -52,9 +56,9 @@ const attempts = {};
 function updateCard() {
   currentWord.textContent = currentIndex + 1;
 
-  cardFront.querySelector('h1').textContent = words[currentIndex];
-  cardBack.querySelector('h1').textContent = translations[currentIndex].name;
-  cardBack.querySelector('span').textContent = translations[currentIndex].example;
+  cardFront.querySelector('h1').textContent = words[currentIndex].word;
+  cardBack.querySelector('h1').textContent = words[currentIndex].translation;
+  cardBack.querySelector('span').textContent = words[currentIndex].example;
 
   buttonBack.disabled = currentIndex === 0;
   buttonNext.disabled = currentIndex === words.length - 1;
@@ -66,17 +70,21 @@ function getExamCards() {
   const examCards = [];
 
   for (let i = 0; i < words.length; i++) {
-    examCards.push(words[i], translations[i].name);
+    examCards.push(words[i].word, words[i].translation);
   };
 
   examCards.sort(() => Math.random() - 0.5);
+
+  const fragment = new DocumentFragment();
 
   examCards.forEach(function(item) {
     const card = document.createElement('div');
     card.classList.add('card');
     card.textContent = item;
-    examContainer.append(card);
-  })
+    fragment.append(card);
+  });
+
+  examContainer.append(fragment);
 };
 
 function resetSelection() {
@@ -120,8 +128,8 @@ function setTimer() {
 function makeResultsTable() {
   words.forEach(function(item) {
     const resultsTable = template.content.cloneNode(true);
-    resultsTable.querySelector('.word span').textContent = item;
-    resultsTable.querySelector('.attempts span').textContent = attempts[item];
+    resultsTable.querySelector('.word span').textContent = item.word;
+    resultsTable.querySelector('.attempts span').textContent = attempts[item.word];
     resultsContainer.append(resultsTable);
   })
 };
@@ -147,17 +155,7 @@ buttonBack.addEventListener('click', function() {
 });
 
 shuffleButton.addEventListener('click', function() {
-  const pairs = words.map((item, index) => ({
-    word: item,
-    translations: translations[index]
-  }));
-
-  pairs.sort(() => Math.random() - 0.5);
-
-  pairs.forEach((item, index) => {
-    words[index] = item.word;
-    translations[index] = item.translations;
-  });
+  words.sort(() => Math.random() - 0.5);
 
   updateCard();
 });
@@ -181,7 +179,7 @@ examContainer.addEventListener('click', function(event) {
   const cardText = clickedCard.textContent;
   attempts[cardText] = (attempts[cardText] || 0) + 1;
 
-  if(!firstCard) {
+  if (!firstCard) {
     firstCard = clickedCard;
     firstCard.classList.add('correct');
     return;
@@ -189,11 +187,11 @@ examContainer.addEventListener('click', function(event) {
 
   secondCard = clickedCard;
 
-  const firstCardIndex = words.indexOf(firstCard.textContent);
-  const secondCardIndex = translations.findIndex((item) => item.name === secondCard.textContent);
+  const firstCardIndex = words.findIndex((item) => item.word === firstCard.textContent);
+  const secondCardIndex = words.findIndex((item) => item.translation === secondCard.textContent);
 
-  const reverseFirstCardIndex = translations.findIndex((item) => item.name === firstCard.textContent);
-  const reverseSecondCardIndex = words.indexOf(secondCard.textContent);
+  const reverseFirstCardIndex = words.findIndex((item) => item.translation === firstCard.textContent);
+  const reverseSecondCardIndex = words.findIndex((item) => item.word === secondCard.textContent);
 
   if ((firstCardIndex !== -1 && firstCardIndex === secondCardIndex) || 
   (reverseFirstCardIndex !== -1 && reverseFirstCardIndex === reverseSecondCardIndex)) {
